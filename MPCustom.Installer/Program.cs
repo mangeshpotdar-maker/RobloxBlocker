@@ -16,19 +16,21 @@ namespace MPCustom.Installer
     {
         private const string ServiceName = "MPCustomService";
         private const string ServiceDisplayName = "MPCustom Service";
+        private static readonly string TargetRootDirectory = OperatingSystem.IsWindows() ? @"C:\Mangesh\Jules\Roblox" : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MPCustom");
         private static string _installLogPath = string.Empty;
 
         public static int Main(string[] args)
         {
-            var logger = new RollingLoggerService();
+            InitInstallLog();
+            var logger = new RollingLoggerService(Path.Combine(TargetRootDirectory, "Logs"));
             var firewallRepo = new FirewallRuleManager(logger);
             var domainRepo = new DomainBlockManager(logger);
-            var configRepo = new ConfigRepository();
+            var configRepo = new ConfigRepository(Path.Combine(TargetRootDirectory, "Config", "protection_config.json"));
 
-            InitInstallLog();
             LogToFile("==================================================");
             LogToFile($"       MPCustom Service Setup Utility Log       ");
             LogToFile($"       Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            LogToFile($"       Target Directory: {TargetRootDirectory}");
             LogToFile($"       OS: {RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})");
             LogToFile("==================================================");
 
@@ -55,8 +57,7 @@ namespace MPCustom.Installer
         {
             try
             {
-                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string logDir = Path.Combine(programData, "MPCustom", "Logs");
+                string logDir = Path.Combine(TargetRootDirectory, "Logs");
                 if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
                 _installLogPath = Path.Combine(logDir, "install.log");
             }
@@ -85,20 +86,16 @@ namespace MPCustom.Installer
 
             try
             {
-                string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                string installDir = Path.Combine(programFiles, "MPCustom");
-
-                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string dataDir = Path.Combine(programData, "MPCustom");
+                string installDir = TargetRootDirectory;
+                string dataDir = TargetRootDirectory;
 
                 LogToFile($"[INFO] Target install folder: {installDir}");
-                LogToFile($"[INFO] Data folder: {dataDir}");
 
                 EnsureDirectoryAndAcl(installDir);
-                EnsureDirectoryAndAcl(dataDir);
+                EnsureDirectoryAndAcl(Path.Combine(installDir, "Config"));
+                EnsureDirectoryAndAcl(Path.Combine(installDir, "Logs"));
 
-                Console.WriteLine($"[INFO] Target Installation Directory: {installDir}");
-                Console.WriteLine($"[INFO] Data Directory: {dataDir}");
+                Console.WriteLine($"[INFO] Target Installation & Data Directory: {installDir}");
 
                 string serviceExePath = Path.Combine(installDir, "MPCustom.Service.exe");
 
@@ -173,11 +170,9 @@ namespace MPCustom.Installer
                     try { File.Delete(startMenu); LogToFile("[INFO] Removed Start Menu shortcut."); } catch { }
                 }
 
-                string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-                string installDir = Path.Combine(programFiles, "MPCustom");
-                if (Directory.Exists(installDir))
+                if (Directory.Exists(TargetRootDirectory))
                 {
-                    try { Directory.Delete(installDir, true); LogToFile("[INFO] Removed installation directory."); } catch { }
+                    try { Directory.Delete(TargetRootDirectory, true); LogToFile("[INFO] Removed installation directory."); } catch { }
                 }
 
                 LogToFile("[SUCCESS] MPCustom Service uninstalled successfully.");

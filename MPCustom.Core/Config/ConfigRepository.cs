@@ -24,8 +24,17 @@ namespace MPCustom.Core.Config
             }
             else
             {
-                var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                var configDir = Path.Combine(programData, "MPCustom", "Config");
+                string configDir;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    configDir = @"C:\Mangesh\Jules\Roblox\Config";
+                }
+                else
+                {
+                    var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                    configDir = Path.Combine(programData, "MPCustom", "Config");
+                }
+
                 EnsureDirectoryAndPermissions(configDir);
                 _configFilePath = Path.Combine(configDir, "protection_config.json");
             }
@@ -37,7 +46,6 @@ namespace MPCustom.Core.Config
         {
             lock (_lock)
             {
-                // Return a deep or new copy or current cached config
                 return _cachedConfig;
             }
         }
@@ -56,7 +64,6 @@ namespace MPCustom.Core.Config
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 var json = JsonSerializer.Serialize(config, options);
 
-                // Atomic write via temp file
                 var tempPath = _configFilePath + ".tmp";
                 File.WriteAllText(tempPath, json);
                 File.Move(tempPath, _configFilePath, overwrite: true);
@@ -94,7 +101,6 @@ namespace MPCustom.Core.Config
                 }
                 catch
                 {
-                    // If reading fails or file corrupted, return new default config
                 }
 
                 var defaultConfig = new ProtectionConfig();
@@ -145,7 +151,6 @@ namespace MPCustom.Core.Config
                 }
                 catch
                 {
-                    // Fail gracefully if not running elevated during test execution
                 }
             }
         }
@@ -178,7 +183,6 @@ namespace MPCustom.Core.Config
                 }
                 catch
                 {
-                    // Fail gracefully
                 }
             }
         }

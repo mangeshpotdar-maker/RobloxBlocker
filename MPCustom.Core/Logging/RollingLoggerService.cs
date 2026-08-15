@@ -26,8 +26,15 @@ namespace MPCustom.Core.Logging
             }
             else
             {
-                var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                _logDirectory = Path.Combine(programData, "MPCustom", "Logs");
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    _logDirectory = @"C:\Mangesh\Jules\Roblox\Logs";
+                }
+                else
+                {
+                    var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                    _logDirectory = Path.Combine(programData, "MPCustom", "Logs");
+                }
             }
 
             EnsureDirectoryAndPermissions(_logDirectory);
@@ -35,7 +42,6 @@ namespace MPCustom.Core.Logging
 
         public void Log(LogLevel level, string category, string message, Exception? exception = null)
         {
-            // Sanitize message to prevent accidental logging of sensitive key phrases or tokens
             var sanitizedMessage = SanitizeMessage(message);
 
             var logEvent = new LogEvent
@@ -64,7 +70,6 @@ namespace MPCustom.Core.Logging
                 }
                 catch
                 {
-                    // Fail-safe: Logging failure should not crash the host service
                 }
             }
         }
@@ -106,7 +111,6 @@ namespace MPCustom.Core.Logging
             }
             catch
             {
-                // Non-critical cleanup exception
             }
         }
 
@@ -114,11 +118,9 @@ namespace MPCustom.Core.Logging
         {
             if (string.IsNullOrEmpty(message)) return string.Empty;
 
-            // Remove or mask potential PIN patterns or secrets if inadvertently passed
             var sanitized = message;
             if (sanitized.Contains("PIN", StringComparison.OrdinalIgnoreCase))
             {
-                // Ensure raw pin values aren't exposed
                 sanitized = System.Text.RegularExpressions.Regex.Replace(sanitized, @"(?i)(pin\s*=\s*)([^\s,]+)", "$1****");
             }
             return sanitized;
@@ -138,7 +140,6 @@ namespace MPCustom.Core.Logging
                     var directoryInfo = new DirectoryInfo(path);
                     var security = directoryInfo.GetAccessControl();
 
-                    // Lock down folder to Administrators and SYSTEM
                     security.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
 
                     var adminSid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
@@ -162,7 +163,6 @@ namespace MPCustom.Core.Logging
                 }
                 catch
                 {
-                    // Fail gracefully if process is running without administrative ACL privileges during dev/test
                 }
             }
         }
