@@ -1,0 +1,16 @@
+/app/MPCustom.Network/bin/Debug/net8.0/MPCustom.Network.deps.json
+/app/MPCustom.Network/bin/Debug/net8.0/MPCustom.Network.dll
+/app/MPCustom.Network/bin/Debug/net8.0/MPCustom.Network.pdb
+/app/MPCustom.Network/bin/Debug/net8.0/MPCustom.Core.dll
+/app/MPCustom.Network/bin/Debug/net8.0/MPCustom.Core.pdb
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.csproj.AssemblyReference.cache
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.GeneratedMSBuildEditorConfig.editorconfig
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.AssemblyInfoInputs.cache
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.AssemblyInfo.cs
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.csproj.CoreCompileInputs.cache
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.sourcelink.json
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.0CA896A0.Up2Date
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.dll
+/app/MPCustom.Network/obj/Debug/net8.0/refint/MPCustom.Network.dll
+/app/MPCustom.Network/obj/Debug/net8.0/MPCustom.Network.pdb
+/app/MPCustom.Network/obj/Debug/net8.0/ref/MPCustom.Network.dll

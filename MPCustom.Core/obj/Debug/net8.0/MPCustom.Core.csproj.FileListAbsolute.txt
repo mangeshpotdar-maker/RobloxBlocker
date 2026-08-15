@@ -1,0 +1,12 @@
+/app/MPCustom.Core/bin/Debug/net8.0/MPCustom.Core.deps.json
+/app/MPCustom.Core/bin/Debug/net8.0/MPCustom.Core.dll
+/app/MPCustom.Core/bin/Debug/net8.0/MPCustom.Core.pdb
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.GeneratedMSBuildEditorConfig.editorconfig
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.AssemblyInfoInputs.cache
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.AssemblyInfo.cs
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.csproj.CoreCompileInputs.cache
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.sourcelink.json
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.dll
+/app/MPCustom.Core/obj/Debug/net8.0/refint/MPCustom.Core.dll
+/app/MPCustom.Core/obj/Debug/net8.0/MPCustom.Core.pdb
+/app/MPCustom.Core/obj/Debug/net8.0/ref/MPCustom.Core.dll

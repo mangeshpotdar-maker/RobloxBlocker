@@ -14,8 +14,11 @@ namespace MPCustom.Control.Forms
 
         private Label _lblStepTitle;
         private Label _lblDescription;
+        private Label _lblPinPrompt;
+        private Label _lblConfirmPrompt;
         private TextBox _txtPin;
         private TextBox _txtConfirmPin;
+        private CheckBox _chkShowPassword;
         private Label _lblPinError;
         private RadioButton _rbAlways;
         private RadioButton _rbScheduled;
@@ -34,8 +37,8 @@ namespace MPCustom.Control.Forms
 
         private void InitializeComponent()
         {
-            this.Text = "MPCustom Control Setup Wizard";
-            this.Size = new Size(580, 420);
+            this.Text = "MPCustom Control - First-Run Setup Wizard";
+            this.Size = new Size(580, 440);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -52,56 +55,90 @@ namespace MPCustom.Control.Forms
             {
                 Font = new Font("Segoe UI", 10F),
                 Location = new Point(30, 60),
-                Size = new Size(500, 80)
+                Size = new Size(500, 70)
+            };
+
+            _lblPinPrompt = new Label
+            {
+                Text = "Enter Administrator PIN / Password:",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Location = new Point(30, 140),
+                Size = new Size(250, 25),
+                Visible = false
             };
 
             _txtPin = new TextBox
             {
-                Location = new Point(150, 150),
-                Size = new Size(200, 25),
+                Location = new Point(30, 165),
+                Size = new Size(300, 25),
                 PasswordChar = '•',
+                Visible = false
+            };
+
+            _lblConfirmPrompt = new Label
+            {
+                Text = "Confirm Administrator PIN / Password:",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Location = new Point(30, 200),
+                Size = new Size(250, 25),
                 Visible = false
             };
 
             _txtConfirmPin = new TextBox
             {
-                Location = new Point(150, 190),
-                Size = new Size(200, 25),
+                Location = new Point(30, 225),
+                Size = new Size(300, 25),
                 PasswordChar = '•',
                 Visible = false
+            };
+
+            _chkShowPassword = new CheckBox
+            {
+                Text = "Show Password",
+                Location = new Point(340, 165),
+                Size = new Size(150, 25),
+                Visible = false
+            };
+            _chkShowPassword.CheckedChanged += (s, e) =>
+            {
+                char mask = _chkShowPassword.Checked ? '\0' : '•';
+                _txtPin.PasswordChar = mask;
+                _txtConfirmPin.PasswordChar = mask;
             };
 
             _lblPinError = new Label
             {
                 ForeColor = Color.Red,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                Location = new Point(150, 225),
-                Size = new Size(350, 25),
+                Location = new Point(30, 260),
+                Size = new Size(480, 40),
                 Visible = false
             };
 
             _rbAlways = new RadioButton
             {
                 Text = "Always Protected (24/7 continuous protection)",
-                Location = new Point(50, 150),
-                Size = new Size(400, 25),
+                Font = new Font("Segoe UI", 9.5F),
+                Location = new Point(50, 140),
+                Size = new Size(450, 25),
                 Checked = true,
                 Visible = false
             };
 
             _rbScheduled = new RadioButton
             {
-                Text = "Scheduled Protection (Enforce protection based on custom schedule)",
-                Location = new Point(50, 185),
-                Size = new Size(400, 25),
+                Text = "Scheduled Protection (Enforce protection based on schedule)",
+                Font = new Font("Segoe UI", 9.5F),
+                Location = new Point(50, 180),
+                Size = new Size(450, 25),
                 Visible = false
             };
 
             _btnBack = new Button
             {
                 Text = "< Back",
-                Location = new Point(330, 330),
-                Size = new Size(90, 30),
+                Location = new Point(330, 350),
+                Size = new Size(90, 32),
                 Enabled = false
             };
             _btnBack.Click += BtnBack_Click;
@@ -109,15 +146,19 @@ namespace MPCustom.Control.Forms
             _btnNext = new Button
             {
                 Text = "Next >",
-                Location = new Point(430, 330),
-                Size = new Size(90, 30)
+                Location = new Point(430, 350),
+                Size = new Size(90, 32),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
             _btnNext.Click += BtnNext_Click;
 
             this.Controls.Add(_lblStepTitle);
             this.Controls.Add(_lblDescription);
+            this.Controls.Add(_lblPinPrompt);
             this.Controls.Add(_txtPin);
+            this.Controls.Add(_lblConfirmPrompt);
             this.Controls.Add(_txtConfirmPin);
+            this.Controls.Add(_chkShowPassword);
             this.Controls.Add(_lblPinError);
             this.Controls.Add(_rbAlways);
             this.Controls.Add(_rbScheduled);
@@ -130,8 +171,11 @@ namespace MPCustom.Control.Forms
             _currentStep = step;
             _btnBack.Enabled = _currentStep > 1;
 
+            _lblPinPrompt.Visible = false;
             _txtPin.Visible = false;
+            _lblConfirmPrompt.Visible = false;
             _txtConfirmPin.Visible = false;
+            _chkShowPassword.Visible = false;
             _lblPinError.Visible = false;
             _rbAlways.Visible = false;
             _rbScheduled.Visible = false;
@@ -139,15 +183,18 @@ namespace MPCustom.Control.Forms
             if (_currentStep == 1)
             {
                 _lblStepTitle.Text = "Welcome to MPCustom Control";
-                _lblDescription.Text = "This setup wizard will configure system protection and set up your secure Administrator PIN.\n\nPlease click Next to begin.";
+                _lblDescription.Text = "This first-run setup wizard will configure system protection and establish your secure Administrator PIN / Password.\n\nClick Next to begin setup.";
                 _btnNext.Text = "Next >";
             }
             else if (_currentStep == 2)
             {
-                _lblStepTitle.Text = "Create Administrator PIN";
-                _lblDescription.Text = "Enter a secure Administrator PIN (minimum 4 characters). You will need this PIN to open MPCustom Control and change protection settings.\n\nNew PIN:\n\nConfirm PIN:";
+                _lblStepTitle.Text = "Create Administrator Password / PIN";
+                _lblDescription.Text = "Set a secure PIN or password (minimum 4 characters). You will need this credential to open MPCustom Control and change protection settings.";
+                _lblPinPrompt.Visible = true;
                 _txtPin.Visible = true;
+                _lblConfirmPrompt.Visible = true;
                 _txtConfirmPin.Visible = true;
+                _chkShowPassword.Visible = true;
                 _btnNext.Text = "Next >";
             }
             else if (_currentStep == 3)
@@ -173,14 +220,14 @@ namespace MPCustom.Control.Forms
 
                 if (string.IsNullOrEmpty(pin1) || pin1.Length < 4)
                 {
-                    _lblPinError.Text = "PIN must be at least 4 characters long.";
+                    _lblPinError.Text = "PIN / Password must be at least 4 characters long.";
                     _lblPinError.Visible = true;
                     return;
                 }
 
                 if (pin1 != pin2)
                 {
-                    _lblPinError.Text = "PINs do not match. Please re-enter.";
+                    _lblPinError.Text = "Credentials do not match. Please re-enter.";
                     _lblPinError.Visible = true;
                     return;
                 }

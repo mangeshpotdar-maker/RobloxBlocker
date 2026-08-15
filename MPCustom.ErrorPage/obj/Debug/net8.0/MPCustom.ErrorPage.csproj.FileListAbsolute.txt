@@ -1,0 +1,16 @@
+/app/MPCustom.ErrorPage/bin/Debug/net8.0/MPCustom.ErrorPage.deps.json
+/app/MPCustom.ErrorPage/bin/Debug/net8.0/MPCustom.ErrorPage.dll
+/app/MPCustom.ErrorPage/bin/Debug/net8.0/MPCustom.ErrorPage.pdb
+/app/MPCustom.ErrorPage/bin/Debug/net8.0/MPCustom.Core.dll
+/app/MPCustom.ErrorPage/bin/Debug/net8.0/MPCustom.Core.pdb
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.csproj.AssemblyReference.cache
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.GeneratedMSBuildEditorConfig.editorconfig
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.AssemblyInfoInputs.cache
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.AssemblyInfo.cs
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.csproj.CoreCompileInputs.cache
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.sourcelink.json
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.05B99FE1.Up2Date
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.dll
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/refint/MPCustom.ErrorPage.dll
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/MPCustom.ErrorPage.pdb
+/app/MPCustom.ErrorPage/obj/Debug/net8.0/ref/MPCustom.ErrorPage.dll
