@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Text;
 using MPCustom.Core.Config;
 using MPCustom.Core.Logging;
 using MPCustom.Network;
@@ -15,6 +16,7 @@ namespace MPCustom.Installer
     {
         private const string ServiceName = "MPCustomService";
         private const string ServiceDisplayName = "MPCustom Service";
+        private static string _installLogPath = string.Empty;
 
         public static int Main(string[] args)
         {
@@ -22,6 +24,13 @@ namespace MPCustom.Installer
             var firewallRepo = new FirewallRuleManager(logger);
             var domainRepo = new DomainBlockManager(logger);
             var configRepo = new ConfigRepository();
+
+            InitInstallLog();
+            LogToFile("==================================================");
+            LogToFile($"       MPCustom Service Setup Utility Log       ");
+            LogToFile($"       Timestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+            LogToFile($"       OS: {RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})");
+            LogToFile("==================================================");
 
             bool isUninstall = args.Any(a => a.Equals("--uninstall", StringComparison.OrdinalIgnoreCase) || a.Equals("-u", StringComparison.OrdinalIgnoreCase));
 
@@ -31,22 +40,47 @@ namespace MPCustom.Installer
 
             if (!IsAdministrator())
             {
+                LogToFile("[ERROR] Installation failed: Missing Windows Administrator privileges.");
                 Console.WriteLine("[ERROR] Installation requires Windows Administrator privileges (UAC elevation).");
+                Console.WriteLine($"[INFO] Detailed log saved to: {_installLogPath}");
                 return 1;
             }
 
-            if (isUninstall)
+            int exitCode = isUninstall ? PerformUninstall(logger, firewallRepo, domainRepo) : PerformInstall(logger, firewallRepo, domainRepo, configRepo);
+            Console.WriteLine($"[INFO] Installation log file generated at: {_installLogPath}");
+            return exitCode;
+        }
+
+        private static void InitInstallLog()
+        {
+            try
             {
-                return PerformUninstall(logger, firewallRepo, domainRepo);
+                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                string logDir = Path.Combine(programData, "MPCustom", "Logs");
+                if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+                _installLogPath = Path.Combine(logDir, "install.log");
             }
-            else
+            catch
             {
-                return PerformInstall(logger, firewallRepo, domainRepo, configRepo);
+                _installLogPath = Path.Combine(Path.GetTempPath(), "mpcustom_install.log");
+            }
+        }
+
+        private static void LogToFile(string message)
+        {
+            try
+            {
+                string line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}";
+                File.AppendAllText(_installLogPath, line + Environment.NewLine, Encoding.UTF8);
+            }
+            catch
+            {
             }
         }
 
         private static int PerformInstall(ILoggerService logger, IFirewallRuleManager firewallRepo, IDomainBlockManager domainRepo, IConfigRepository configRepo)
         {
+            LogToFile("[INFO] Starting MPCustom Service installation sequence...");
             Console.WriteLine("[INFO] Starting MPCustom Service installation...");
 
             try
@@ -57,6 +91,9 @@ namespace MPCustom.Installer
                 string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
                 string dataDir = Path.Combine(programData, "MPCustom");
 
+                LogToFile($"[INFO] Target install folder: {installDir}");
+                LogToFile($"[INFO] Data folder: {dataDir}");
+
                 EnsureDirectoryAndAcl(installDir);
                 EnsureDirectoryAndAcl(dataDir);
 
@@ -66,10 +103,12 @@ namespace MPCustom.Installer
                 string serviceExePath = Path.Combine(installDir, "MPCustom.Service.exe");
 
                 // Stop existing service if running
+                LogToFile("[INFO] Stopping any pre-existing MPCustomService...");
                 RunCommand("sc", $"stop {ServiceName}");
                 RunCommand("sc", $"delete {ServiceName}");
 
                 // Register Windows Service
+                LogToFile("[INFO] Registering Windows Service (MPCustomService)...");
                 Console.WriteLine("[INFO] Registering Windows Service (MPCustomService)...");
                 if (OperatingSystem.IsWindows())
                 {
@@ -80,26 +119,31 @@ namespace MPCustom.Installer
                 }
 
                 // Create initial configuration & firewall rules
+                LogToFile("[INFO] Configuring domain protection and firewall rules...");
                 Console.WriteLine("[INFO] Configuring protection rules and firewall engine...");
                 var config = configRepo.GetConfig();
-                domainRepo.ApplyDomainBlocks(config.RobloxRules.BlockedDomains);
+                bool domApplied = domainRepo.ApplyDomainBlocks(config.RobloxRules.BlockedDomains);
+                LogToFile($"[INFO] Domain block hosts update status: {domApplied}");
 
                 var knownExes = new[]
                 {
                     Path.Combine(installDir, "RobloxPlayerBeta.exe"),
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Roblox", "Versions", "RobloxPlayerBeta.exe")
                 };
-                firewallRepo.EnsureRulesExist(knownExes);
+                bool fwApplied = firewallRepo.EnsureRulesExist(knownExes);
+                LogToFile($"[INFO] Firewall rule application status: {fwApplied}");
 
                 // Create Start Menu shortcut
                 CreateStartMenuShortcut(installDir);
 
+                LogToFile("[SUCCESS] MPCustom Service installed and verified successfully.");
                 Console.WriteLine("[SUCCESS] MPCustom Service installed and started successfully!");
                 logger.LogInfo("Installer", "MPCustom Service installation completed successfully");
                 return 0;
             }
             catch (Exception ex)
             {
+                LogToFile($"[ERROR] Exception during installation: {ex}");
                 Console.WriteLine($"[ERROR] Installation failed: {ex.Message}");
                 logger.LogError("Installer", "Installation failed", ex);
                 return 1;
@@ -108,48 +152,42 @@ namespace MPCustom.Installer
 
         private static int PerformUninstall(ILoggerService logger, IFirewallRuleManager firewallRepo, IDomainBlockManager domainRepo)
         {
+            LogToFile("[INFO] Starting MPCustom Service uninstallation sequence...");
             Console.WriteLine("[INFO] Starting MPCustom Service uninstallation...");
 
             try
             {
-                // Stop and delete Windows Service
+                LogToFile("[INFO] Stopping and deleting Windows Service...");
                 Console.WriteLine("[INFO] Stopping and deleting Windows Service...");
                 RunCommand("sc", $"stop {ServiceName}");
                 RunCommand("sc", $"delete {ServiceName}");
 
-                // Remove firewall rules and domain blocks
+                LogToFile("[INFO] Removing firewall rules and domain blocks...");
                 Console.WriteLine("[INFO] Cleaning firewall rules and domain blocks...");
                 firewallRepo.RemoveAllRules();
                 domainRepo.RemoveDomainBlocks();
 
-                // Clean shortcuts
                 string startMenu = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonStartMenu), "Programs", "MPCustom Control.lnk");
                 if (File.Exists(startMenu))
                 {
-                    try { File.Delete(startMenu); } catch { }
+                    try { File.Delete(startMenu); LogToFile("[INFO] Removed Start Menu shortcut."); } catch { }
                 }
 
-                // Clean files
                 string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
                 string installDir = Path.Combine(programFiles, "MPCustom");
                 if (Directory.Exists(installDir))
                 {
-                    try { Directory.Delete(installDir, true); } catch { }
+                    try { Directory.Delete(installDir, true); LogToFile("[INFO] Removed installation directory."); } catch { }
                 }
 
-                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string dataDir = Path.Combine(programData, "MPCustom");
-                if (Directory.Exists(dataDir))
-                {
-                    try { Directory.Delete(dataDir, true); } catch { }
-                }
-
+                LogToFile("[SUCCESS] MPCustom Service uninstalled successfully.");
                 Console.WriteLine("[SUCCESS] MPCustom Service uninstalled successfully!");
                 logger.LogInfo("Installer", "MPCustom Service uninstallation completed successfully");
                 return 0;
             }
             catch (Exception ex)
             {
+                LogToFile($"[ERROR] Uninstallation failed: {ex}");
                 Console.WriteLine($"[ERROR] Uninstallation failed: {ex.Message}");
                 logger.LogError("Installer", "Uninstallation failed", ex);
                 return 1;
@@ -179,6 +217,7 @@ namespace MPCustom.Installer
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
+                LogToFile($"[INFO] Created directory: {path}");
             }
 
             if (OperatingSystem.IsWindows())
@@ -196,9 +235,11 @@ namespace MPCustom.Installer
                     security.AddAccessRule(new FileSystemAccessRule(systemSid, FileSystemRights.FullControl, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
 
                     dirInfo.SetAccessControl(security);
+                    LogToFile($"[INFO] Configured ACL permissions for: {path}");
                 }
-                catch
+                catch (Exception ex)
                 {
+                    LogToFile($"[WARNING] Could not set ACL permissions on '{path}': {ex.Message}");
                 }
             }
         }
@@ -213,13 +254,14 @@ namespace MPCustom.Installer
 
                 if (OperatingSystem.IsWindows() && File.Exists(targetExe))
                 {
-                    // Create shortcut via PowerShell script
                     string psCommand = $"$s=(New-Object -COM WScript.Shell).CreateShortcut('{shortcutPath}');$s.TargetPath='{targetExe}';$s.Save()";
                     RunCommand("powershell", $"-NoProfile -ExecutionPolicy Bypass -Command \"{psCommand}\"");
+                    LogToFile($"[INFO] Created Start Menu shortcut at: {shortcutPath}");
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                LogToFile($"[WARNING] Failed to create shortcut: {ex.Message}");
             }
         }
 
@@ -227,6 +269,7 @@ namespace MPCustom.Installer
         {
             try
             {
+                LogToFile($"[CMD EXEC] {fileName} {arguments}");
                 var psi = new ProcessStartInfo
                 {
                     FileName = fileName,
@@ -238,10 +281,18 @@ namespace MPCustom.Installer
                 };
 
                 using var proc = Process.Start(psi);
-                proc?.WaitForExit(5000);
+                if (proc != null)
+                {
+                    string outText = proc.StandardOutput.ReadToEnd();
+                    string errText = proc.StandardError.ReadToEnd();
+                    proc.WaitForExit(5000);
+                    if (!string.IsNullOrWhiteSpace(outText)) LogToFile($"[CMD STDOUT] {outText.Trim()}");
+                    if (!string.IsNullOrWhiteSpace(errText)) LogToFile($"[CMD STDERR] {errText.Trim()}");
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                LogToFile($"[CMD ERROR] Error running {fileName}: {ex.Message}");
             }
         }
     }
