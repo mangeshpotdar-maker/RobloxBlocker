@@ -1,0 +1,14 @@
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+[Dd]ebug/
+[R3release/
+[Rr]elease/
+x64/
+x86/
+build/
+*.nupkg

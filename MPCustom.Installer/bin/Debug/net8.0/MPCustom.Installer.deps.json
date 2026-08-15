@@ -1,0 +1,73 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "MPCustom.Installer/1.0.0": {
+        "dependencies": {
+          "MPCustom.Core": "1.0.0",
+          "MPCustom.Network": "1.0.0",
+          "MPCustom.Security": "1.0.0"
+        },
+        "runtime": {
+          "MPCustom.Installer.dll": {}
+        }
+      },
+      "MPCustom.Core/1.0.0": {
+        "runtime": {
+          "MPCustom.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "MPCustom.Network/1.0.0": {
+        "dependencies": {
+          "MPCustom.Core": "1.0.0"
+        },
+        "runtime": {
+          "MPCustom.Network.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "MPCustom.Security/1.0.0": {
+        "dependencies": {
+          "MPCustom.Core": "1.0.0"
+        },
+        "runtime": {
+          "MPCustom.Security.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MPCustom.Installer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MPCustom.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MPCustom.Network/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MPCustom.Security/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

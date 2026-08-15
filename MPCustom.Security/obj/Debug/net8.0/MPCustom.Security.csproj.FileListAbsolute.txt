@@ -1,0 +1,16 @@
+/app/MPCustom.Security/bin/Debug/net8.0/MPCustom.Security.deps.json
+/app/MPCustom.Security/bin/Debug/net8.0/MPCustom.Security.dll
+/app/MPCustom.Security/bin/Debug/net8.0/MPCustom.Security.pdb
+/app/MPCustom.Security/bin/Debug/net8.0/MPCustom.Core.dll
+/app/MPCustom.Security/bin/Debug/net8.0/MPCustom.Core.pdb
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.csproj.AssemblyReference.cache
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.GeneratedMSBuildEditorConfig.editorconfig
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.AssemblyInfoInputs.cache
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.AssemblyInfo.cs
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.csproj.CoreCompileInputs.cache
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.sourcelink.json
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.2925BBB5.Up2Date
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.dll
+/app/MPCustom.Security/obj/Debug/net8.0/refint/MPCustom.Security.dll
+/app/MPCustom.Security/obj/Debug/net8.0/MPCustom.Security.pdb
+/app/MPCustom.Security/obj/Debug/net8.0/ref/MPCustom.Security.dll

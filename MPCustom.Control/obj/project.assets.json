@@ -1,0 +1,228 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0-windows7.0": {
+      "System.Security.Cryptography.ProtectedData/8.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/System.Security.Cryptography.ProtectedData.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
+      "MPCustom.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/MPCustom.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MPCustom.Core.dll": {}
+        }
+      },
+      "MPCustom.ErrorPage/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MPCustom.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MPCustom.ErrorPage.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MPCustom.ErrorPage.dll": {}
+        }
+      },
+      "MPCustom.Network/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MPCustom.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MPCustom.Network.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MPCustom.Network.dll": {}
+        }
+      },
+      "MPCustom.Security/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MPCustom.Core": "1.0.0",
+          "System.Security.Cryptography.ProtectedData": "8.0.0"
+        },
+        "compile": {
+          "bin/placeholder/MPCustom.Security.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/MPCustom.Security.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "System.Security.Cryptography.ProtectedData/8.0.0": {
+      "sha512": "+TUFINV2q2ifyXauQXRwy4CiBhqvDEDZeVJU7qfxya4aRYOKzVBpN+4acx25VcPB9ywUN6C0n8drWl110PhZEg==",
+      "type": "package",
+      "path": "system.security.cryptography.protecteddata/8.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "PACKAGE.md",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/net461/System.Security.Cryptography.ProtectedData.targets",
+        "buildTransitive/net462/_._",
+        "buildTransitive/net6.0/_._",
+        "buildTransitive/netcoreapp2.0/System.Security.Cryptography.ProtectedData.targets",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net462/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net462/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net6.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net6.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net7.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net7.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/net8.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/net8.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll",
+        "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "system.security.cryptography.protecteddata.8.0.0.nupkg.sha512",
+        "system.security.cryptography.protecteddata.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
+    "MPCustom.Core/1.0.0": {
+      "type": "project",
+      "path": "../MPCustom.Core/MPCustom.Core.csproj",
+      "msbuildProject": "../MPCustom.Core/MPCustom.Core.csproj"
+    },
+    "MPCustom.ErrorPage/1.0.0": {
+      "type": "project",
+      "path": "../MPCustom.ErrorPage/MPCustom.ErrorPage.csproj",
+      "msbuildProject": "../MPCustom.ErrorPage/MPCustom.ErrorPage.csproj"
+    },
+    "MPCustom.Network/1.0.0": {
+      "type": "project",
+      "path": "../MPCustom.Network/MPCustom.Network.csproj",
+      "msbuildProject": "../MPCustom.Network/MPCustom.Network.csproj"
+    },
+    "MPCustom.Security/1.0.0": {
+      "type": "project",
+      "path": "../MPCustom.Security/MPCustom.Security.csproj",
+      "msbuildProject": "../MPCustom.Security/MPCustom.Security.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0-windows7.0": [
+      "MPCustom.Core >= 1.0.0",
+      "MPCustom.ErrorPage >= 1.0.0",
+      "MPCustom.Network >= 1.0.0",
+      "MPCustom.Security >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/jules/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/app/MPCustom.Control/MPCustom.Control.csproj",
+      "projectName": "MPCustom.Control",
+      "projectPath": "/app/MPCustom.Control/MPCustom.Control.csproj",
+      "packagesPath": "/home/jules/.nuget/packages/",
+      "outputPath": "/app/MPCustom.Control/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/jules/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0-windows"
+      ],
+      "sources": {
+        "/usr/lib/dotnet/library-packs": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
+          "projectReferences": {
+            "/app/MPCustom.Core/MPCustom.Core.csproj": {
+              "projectPath": "/app/MPCustom.Core/MPCustom.Core.csproj"
+            },
+            "/app/MPCustom.ErrorPage/MPCustom.ErrorPage.csproj": {
+              "projectPath": "/app/MPCustom.ErrorPage/MPCustom.ErrorPage.csproj"
+            },
+            "/app/MPCustom.Network/MPCustom.Network.csproj": {
+              "projectPath": "/app/MPCustom.Network/MPCustom.Network.csproj"
+            },
+            "/app/MPCustom.Security/MPCustom.Security.csproj": {
+              "projectPath": "/app/MPCustom.Security/MPCustom.Security.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "10.0.100"
+    },
+    "frameworks": {
+      "net8.0-windows7.0": {
+        "targetAlias": "net8.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.24, 8.0.24]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WindowsForms": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
