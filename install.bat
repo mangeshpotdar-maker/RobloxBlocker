@@ -6,6 +6,10 @@ setlocal EnableDelayedExpansion
 
 title MPCustom Service Installer
 
+:: Ensure script working directory is preserved under UAC elevation
+cd /d "%~dp0"
+set "SCRIPT_DIR=%~dp0"
+
 :: Check for Administrator Privileges
 net session >nul 2>&1
 if %errorlevel% neq 0 (
@@ -13,6 +17,10 @@ if %errorlevel% neq 0 (
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
+
+:: Re-verify script directory after elevation
+cd /d "%~dp0"
+set "SCRIPT_DIR=%~dp0"
 
 echo ============================================================================
 echo                      MPCustom Service Setup Utility
@@ -23,15 +31,15 @@ set "TARGET_DIR=C:\Mangesh\Jules\Roblox"
 set "ALT_DIR=C:\Mangesh\Jules"
 set "LOG_DIR=%TARGET_DIR%\Logs"
 set "LOG_FILE=%LOG_DIR%\install.log"
-set "SCRIPT_DIR=%~dp0"
 
 if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
 if not exist "%ALT_DIR%" mkdir "%ALT_DIR%"
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 if not exist "%TARGET_DIR%\Config" mkdir "%TARGET_DIR%\Config"
 
-echo [%DATE% %TIME%] Starting MPCustom Service Batch Installation... > "%LOG_FILE%"
-echo [%DATE% %TIME%] Target installation directory: %TARGET_DIR% >> "%LOG_FILE%"
+echo [%DATE% %TIME%] Starting MPCustom Service Standalone Installation... > "%LOG_FILE%"
+echo [%DATE% %TIME%] Script Directory: %SCRIPT_DIR% >> "%LOG_FILE%"
+echo [%DATE% %TIME%] Target Directory: %TARGET_DIR% >> "%LOG_FILE%"
 
 :: ============================================================================
 :: 1. PREREQUISITE AUDIT & AUTOMATED DEPENDENCY INSTALLATION
@@ -39,10 +47,13 @@ echo [%DATE% %TIME%] Target installation directory: %TARGET_DIR% >> "%LOG_FILE%"
 echo [1/6] Auditing system prerequisites (.NET 8 Desktop Runtime)...
 echo [%DATE% %TIME%] Auditing .NET Desktop Runtime prerequisite... >> "%LOG_FILE%"
 
-dotnet --list-runtimes 2>nul | findstr /I "Microsoft.WindowsDesktop.App 8." >nul 2>&1
-set DESKTOP_RUNTIME_EXISTS=%errorlevel%
+reg query "HKLM\SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost" /v "Version" >nul 2>&1
+set DOTNET_HOST_EXISTS=%errorlevel%
 
-if %DESKTOP_RUNTIME_EXISTS% neq 0 (
+reg query "HKLM\SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App" >nul 2>&1
+set DESKTOP_REG_EXISTS=%errorlevel%
+
+if %DESKTOP_REG_EXISTS% neq 0 (
     echo [INFO] .NET 8 Desktop Runtime not detected. Downloading official Microsoft installer...
     echo [%DATE% %TIME%] .NET Desktop Runtime missing. Downloading from Microsoft CDN... >> "%LOG_FILE%"
 
@@ -67,9 +78,9 @@ if %DESKTOP_RUNTIME_EXISTS% neq 0 (
 )
 
 :: ============================================================================
-:: 2. DEPLOY PRE-COMPILED STANDALONE BINARIES
+:: 2. DEPLOY PRE-COMPILED STANDALONE BINARIES (NO SDK REQUIRED)
 :: ============================================================================
-echo [2/6] Deploying pre-compiled application binaries...
+echo [2/6] Deploying standalone pre-compiled application binaries...
 echo [%DATE% %TIME%] Deploying binaries... >> "%LOG_FILE%"
 
 set "SRC_DIR="
@@ -77,31 +88,30 @@ if exist "%SCRIPT_DIR%dist\MPCustom.Service.exe" (
     set "SRC_DIR=%SCRIPT_DIR%dist"
 ) else if exist "%SCRIPT_DIR%MPCustom.Service.exe" (
     set "SRC_DIR=%SCRIPT_DIR%"
+) else if exist ".\dist\MPCustom.Service.exe" (
+    set "SRC_DIR=.\dist"
+) else if exist ".\MPCustom.Service.exe" (
+    set "SRC_DIR=."
 )
 
 if defined SRC_DIR (
-    echo [INFO] Deploying pre-compiled binaries from "%SRC_DIR%"...
+    echo [INFO] Source directory identified: "%SRC_DIR%"
+    echo [%DATE% %TIME%] Copying files from "%SRC_DIR%" to "%TARGET_DIR%" >> "%LOG_FILE%"
     xcopy "%SRC_DIR%\*" "%TARGET_DIR%\" /E /Y /Q >> "%LOG_FILE%" 2>&1
     xcopy "%SRC_DIR%\*" "%ALT_DIR%\" /E /Y /Q >> "%LOG_FILE%" 2>&1
 ) else (
-    echo [INFO] Pre-compiled binaries not found. Building locally...
-    dotnet publish "%SCRIPT_DIR%MPCustom.Service\MPCustom.Service.csproj" -c Release -o "%TARGET_DIR%" --nologo >> "%LOG_FILE%" 2>&1
-    dotnet publish "%SCRIPT_DIR%MPCustom.Control\MPCustom.Control.csproj" -c Release -o "%TARGET_DIR%" --nologo >> "%LOG_FILE%" 2>&1
-    dotnet publish "%SCRIPT_DIR%MPCustom.Installer\MPCustom.Installer.csproj" -c Release -o "%TARGET_DIR%" --nologo >> "%LOG_FILE%" 2>&1
-
-    xcopy "%TARGET_DIR%\*" "%ALT_DIR%\" /E /Y /Q >> "%LOG_FILE%" 2>&1
+    echo [ERROR] Pre-compiled binaries not found in installer folder!
+    echo [%DATE% %TIME%] ERROR: Pre-compiled binaries missing in %SCRIPT_DIR% >> "%LOG_FILE%"
+    pause
+    exit /b 1
 )
 
-:: Ensure binaries exist in target locations
-if not exist "%TARGET_DIR%\MPCustom.Control.exe" (
-    if exist "%ALT_DIR%\MPCustom.Control.exe" (
-        copy /Y "%ALT_DIR%\MPCustom.Control.exe" "%TARGET_DIR%\" >nul 2>&1
-    )
-)
-if not exist "%ALT_DIR%\MPCustom.Control.exe" (
-    if exist "%TARGET_DIR%\MPCustom.Control.exe" (
-        copy /Y "%TARGET_DIR%\MPCustom.Control.exe" "%ALT_DIR%\" >nul 2>&1
-    )
+:: Verify critical executables exist in target location
+if not exist "%TARGET_DIR%\MPCustom.Service.exe" (
+    echo [ERROR] MPCustom.Service.exe missing in %TARGET_DIR%!
+    echo [%DATE% %TIME%] ERROR: MPCustom.Service.exe missing in %TARGET_DIR% >> "%LOG_FILE%"
+    pause
+    exit /b 1
 )
 
 :: ============================================================================
@@ -117,8 +127,12 @@ icacls "%ALT_DIR%" /grant:r "Administrators":(OI)(CI)F /grant:r "SYSTEM":(OI)(CI
 :: ============================================================================
 echo [4/6] Registering and starting Windows Service (MPCustomService)...
 echo [%DATE% %TIME%] Registering MPCustomService... >> "%LOG_FILE%"
-sc stop MPCustomService >> "%LOG_FILE%" 2>&1
-sc delete MPCustomService >> "%LOG_FILE%" 2>&1
+
+sc query MPCustomService >nul 2>&1
+if %errorlevel% equ 0 (
+    sc stop MPCustomService >> "%LOG_FILE%" 2>&1
+    sc delete MPCustomService >> "%LOG_FILE%" 2>&1
+)
 
 sc create MPCustomService binPath= "%TARGET_DIR%\MPCustom.Service.exe" start= auto DisplayName= "MPCustom Service" >> "%LOG_FILE%" 2>&1
 sc failure MPCustomService reset= 86400 actions= restart/60000/restart/60000/restart/60000 >> "%LOG_FILE%" 2>&1
@@ -145,9 +159,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "$s=(New-Object -COM WScr
 echo.
 echo ============================================================================
 echo [SUCCESS] MPCustom Service installation completed successfully!
-echo [INFO] Primary Target Location: %TARGET_DIR%
+echo [INFO] Target Directory: %TARGET_DIR%
 echo [INFO] Executables Deployed:
 echo        - %TARGET_DIR%\MPCustom.Control.exe
+echo        - %TARGET_DIR%\MPCustom.Service.exe
 echo        - %ALT_DIR%\MPCustom.Control.exe
 echo [INFO] Installation log file saved to:
 echo        %LOG_FILE%
